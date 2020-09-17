@@ -28,12 +28,17 @@ public class SlidingWindowCounter {
 
 
     }
-    public int getSize(){
+
+    public void reset(int size) {
+        queue = new ArrayBlockingQueue<Integer>(size);
+    }
+
+    public int getSize() {
         return queue.size();
     }
 
 
-    public  int totalCount() {
+    public int totalCount() {
         return queue.stream().mapToInt(item -> item.intValue()).sum();
     }
 

@@ -1,12 +1,11 @@
 package org.example.cb;
 
-import org.example.state.State;
 
 public abstract class AbstractCircuitBreaker implements CircuitBreaker  {
     /**
      * 熔断器默认当前状态
      */
-    public volatile State state = null;
+    public volatile String state = "close";
 
     /**
      * 关闭状态时，多少次请求中发生多少次失败进入开启状态（默认50次请求里发生10次失败）
@@ -18,12 +17,12 @@ public abstract class AbstractCircuitBreaker implements CircuitBreaker  {
      */
     public int timeForOpen = 600;
 
-    public State getState() {
+    public String getState() {
         return state;
     }
 
-    public void setState(State state) {
-        State currentState = getState();
+    public void setState(String state) {
+        String currentState = getState();
         if (currentState.getClass().getSimpleName().equals(state.getClass().getSimpleName())){
             return;
         }
