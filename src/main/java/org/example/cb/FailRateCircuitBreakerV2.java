@@ -10,67 +10,68 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 基于滑动数组统计 每50次请求10次失败
+ * 基于区间统计，每50次请求存在10次失败，有临界点问题
  */
-public class FailRateCircuitBreaker extends AbstractCircuitBreaker {
-    AtomicInteger num = new AtomicInteger();
-    AtomicInteger failNum = new AtomicInteger();
+public class FailRateCircuitBreakerV2 extends AbstractCircuitBreaker {
+    AtomicInteger num = new AtomicInteger();//总调用次数
+    AtomicInteger failNum = new AtomicInteger();//失败次数
     /**
      * 熔断器默认当前状态
      */
     public volatile String state = "close";
+
     public String getState() {
         return state;
     }
 
     public void setState(String state) {
         String currentState = getState();
-        if (currentState.getClass().getSimpleName().equals(state.getClass().getSimpleName())){
+        if (currentState.getClass().getSimpleName().equals(state.getClass().getSimpleName())) {
             return;
         }
-        synchronized (this){
+        synchronized (this) {
             // 二次判断
             currentState = getState();
-            if (currentState.getClass().getSimpleName().equals(state.getClass().getSimpleName())){
+            if (currentState.getClass().getSimpleName().equals(state.getClass().getSimpleName())) {
                 return;
             }
             this.state = state;
         }
     }
 
-    private SlidingWindowCounter slidingWindowCounter;
+//    private SlidingWindowCounter slidingWindowCounter;
 
     Object target;
 
-    public FailRateCircuitBreaker(String failRateForClose, int timeForOpen, Object object) {
+    public FailRateCircuitBreakerV2(String failRateForClose, int timeForOpen, Object object) {
         this.failRateForClose = failRateForClose;
         this.timeForOpen = timeForOpen;
         this.target = object;
         String[] rate = failRateForClose.split("/");
         int size = Integer.valueOf(rate[1]);
-        slidingWindowCounter = new SlidingWindowCounter(size);
+//        slidingWindowCounter = new SlidingWindowCounter(size);
         //熔断器默认关闭
         toClosedState();
 
 
-
     }
 
-    protected void toClosedState(){
+    protected void toClosedState() {
         state = "close";
         String[] rate = failRateForClose.split("/");
         int size = Integer.valueOf(rate[1]);
-        slidingWindowCounter.reset(size);
+//        slidingWindowCounter.reset(size);
     }
-    protected void toOpenState(){
+
+    protected void toOpenState() {
         state = "open";
-        System.out.println(new Date(System.currentTimeMillis())+" >>>>>>> 熔断器已开启");
+        System.out.println(new Date(System.currentTimeMillis()) + " >>>>>>> 熔断器已开启");
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                state = "close";
-                System.out.println(new Date(System.currentTimeMillis())+" >>>>>>> 熔断器已关闭");
+                close();
+                System.out.println(new Date(System.currentTimeMillis()) + " >>>>>>> 熔断器已关闭");
             }
         }, timeForOpen * 1000);
     }
@@ -79,14 +80,14 @@ public class FailRateCircuitBreaker extends AbstractCircuitBreaker {
     public Object invoke(Object proxy, Method method, Object[] args) throws Exception {
         //让state内存可见
 
-//        protectedCodeBefore();
+        protectedCodeBefore();
 
 
         Object result = null;
         try {
-            if(this.getState().equals("close")) {
+            if (this.getState().equals("close")) {
                 result = method.invoke(target, args);
-            }else{
+            } else {
                 System.out.println("拦截业务方法");
             }
             //服务调用成功计数
@@ -113,17 +114,29 @@ public class FailRateCircuitBreaker extends AbstractCircuitBreaker {
         state = "open";
 
 
-    }
-    @Override
-    public void close() {
-        state = "close";
+
     }
 
     @Override
-    public void protectedCodeBefore() throws Exception{
+    public void close() {
+        state = "close";
+        num.set(0);
+        failNum.set(0);
+    }
+
+    @Override
+    public void protectedCodeBefore() throws Exception {
         synchronized (this) {
             if ("close".equals(state)) {
-                System.out.println("熔断器关闭状态->接口调用次数 " + num.incrementAndGet());
+                int totalCount = num.incrementAndGet();
+                String[] rate = failRateForClose.split("/");
+                int size = Integer.valueOf(rate[1]);
+
+                if (totalCount >= size) {
+                    failNum.set(0);
+                    num.set(0);
+                }
+                System.out.println("熔断器关闭状态->接口调用次数 " + totalCount);
             }
             if ("open".equals(state)) {
                 throw new TimeoutException("服务接口已熔断，已触发告警，请稍等！");
@@ -133,19 +146,17 @@ public class FailRateCircuitBreaker extends AbstractCircuitBreaker {
 
     @Override
     public void protectedCodeSuccess() {
-        if("close".equals(state)) {
-            slidingWindowCounter.add(0);
-        }
+
     }
 
     @Override
     public synchronized void protectedCodeFail() {
 //        System.out.println("熔断器关闭状态->接口调用失败次数 " + failNum.incrementAndGet());
-        if("close".equals(state)) {
-            slidingWindowCounter.add(1);
+        if ("close".equals(state)) {
+            int failCount = failNum.incrementAndGet();
             String[] rate = getFailRateForClose().split("/");
             int failNum = Integer.valueOf(rate[0]);
-            if (slidingWindowCounter.totalCount() == failNum) {
+            if (failCount == failNum) {
                 //熔断器开启
                 toOpenState();
 

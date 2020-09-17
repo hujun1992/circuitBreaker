@@ -21,4 +21,5 @@ public interface CircuitBreaker extends InvocationHandler {
      * 受保护代码块调用失败执行的逻辑
      */
     public void protectedCodeFail();
+    public boolean canPassCheck();
 }

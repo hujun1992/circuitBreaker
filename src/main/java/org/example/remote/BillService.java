@@ -3,18 +3,17 @@ package org.example.remote;
 import java.util.Random;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLongArray;
 
 /**
  * 模拟订单查询的接口
  */
 public class BillService implements RemoteService {
-    AtomicInteger num = new AtomicInteger();
 
 
     @Override
     public String call() throws Exception {
-        System.out.println("service接口调用次数  "+ num.incrementAndGet());
-
+//        System.out.println("service接口调用次数  " + num.incrementAndGet());
         Random random = new Random();
         //50%概率会超时
         if (random.nextInt(2) == 1) {
