@@ -10,7 +10,7 @@ public class BillService implements RemoteService {
 
 
     @Override
-    public String call() throws TimeoutException {
+    public String call() throws Exception {
 
         Random random = new Random();
         //50%概率会超时
@@ -21,8 +21,10 @@ public class BillService implements RemoteService {
                 e.printStackTrace();
             }
             throw new TimeoutException();
-        } else {
-            return queryOrderSuccess();
+        }
+        else {
+            throw new TimeoutException();
+//            return queryOrderSuccess();
         }
 
     }

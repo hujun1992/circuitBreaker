@@ -23,8 +23,6 @@ public abstract class AbstractCircuitBreaker implements CircuitBreaker  {
     }
 
     public void setState(State state) {
-
-        // 当前状态不能切换为当前状态
         State currentState = getState();
         if (currentState.getClass().getSimpleName().equals(state.getClass().getSimpleName())){
             return;

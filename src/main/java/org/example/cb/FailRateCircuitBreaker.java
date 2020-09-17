@@ -26,8 +26,13 @@ public class FailRateCircuitBreaker extends AbstractCircuitBreaker {
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws TimeoutException {
+    public Object invoke(Object proxy, Method method, Object[] args) throws Exception {
+        //让state内存可见
+        System.out.println(this);
+        System.out.println(state instanceof CloseState);
         state.protectedCodeBefore();
+
+
         Object result = null;
         try {
             result = method.invoke(target, args);

@@ -6,7 +6,7 @@ public interface State {
     /**
      * 调用受保护代码块之前执行的逻辑
      */
-    public void protectedCodeBefore() throws TimeoutException;
+    public void protectedCodeBefore() throws RuntimeException, Exception;
 
     /**
      * 受保护代码块调用成功执行的逻辑

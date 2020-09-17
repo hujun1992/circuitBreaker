@@ -27,7 +27,7 @@ public class OpenState implements State {
     }
 
     @Override
-    public  void protectedCodeBefore() throws TimeoutException {
+    public  void protectedCodeBefore() throws Exception {
 
         throw new TimeoutException("服务接口已熔断，已触发告警，请稍等！");
 

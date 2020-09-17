@@ -32,7 +32,7 @@ public class AppTest {
             try {
                 //线程等待
                 countDownLatchStart.await();
-                for(int i=0; i < 2; i++) {
+                for(int i=0; i < 1; i++) {
 
                     String result = CircuitBreakerRunner.run(circuitBreaker, service);
 //                    System.out.println(System.currentTimeMillis() + ": "+ result);
@@ -59,7 +59,7 @@ public class AppTest {
 
         RemoteService service = new BillService();
         //定义熔断器
-        CircuitBreaker circuitBreaker = new FailRateCircuitBreaker("10/20", 20, service);
+        CircuitBreaker circuitBreaker = new FailRateCircuitBreaker("5/50", 20, service);
 
         //启动100个线程，每个线程请求10次
         for(int i =0; i< 50; i ++){
@@ -79,10 +79,10 @@ public class AppTest {
 
         RemoteService service = new BillService();
         //定义熔断器
-        CircuitBreaker circuitBreaker = new FailRateCircuitBreaker("10/50", 20, service);
+        CircuitBreaker circuitBreaker = new FailRateCircuitBreaker("5/10", 20, service);
 
 
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 20; i++) {
                 try {
                 String result = CircuitBreakerRunner.run(circuitBreaker, service);
                 }catch (Exception e){
