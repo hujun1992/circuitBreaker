@@ -5,8 +5,10 @@ import org.example.state.OpenState;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class FailRateCircuitBreaker extends AbstractCircuitBreaker {
+    AtomicInteger num = new AtomicInteger();
 
     Object target;
 
@@ -43,6 +45,9 @@ public class FailRateCircuitBreaker extends AbstractCircuitBreaker {
             if (state instanceof OpenState) {
                 state.protectedCodeBefore();
             }
+        }finally {
+            System.out.println("接口调用次数 " + num.incrementAndGet());
+
         }
         return result;
     }

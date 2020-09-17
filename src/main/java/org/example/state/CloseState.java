@@ -20,6 +20,7 @@ public class CloseState implements State {
 
     @Override
     public void protectedCodeBefore() {
+
     }
 
     @Override
@@ -28,16 +29,14 @@ public class CloseState implements State {
     }
 
     @Override
-    public void protectedCodeFail() {
+    public synchronized void protectedCodeFail() {
         slidingWindowCounter.add(1);
         String[] rate = abstractCircuitBreaker.getFailRateForClose().split("/");
         int failNum = Integer.valueOf(rate[0]);
-        System.out.println("接口调用失败 queue " + slidingWindowCounter.toString() + " failSum" + slidingWindowCounter.totalCount());
-        synchronized (this) {
-            if (slidingWindowCounter.totalCount() == failNum) {
-                //熔断器开启
-                abstractCircuitBreaker.setState(new OpenState(abstractCircuitBreaker));
-            }
+
+        if (slidingWindowCounter.totalCount() == failNum) {
+            //熔断器开启
+            abstractCircuitBreaker.setState(new OpenState(abstractCircuitBreaker));
         }
 
 

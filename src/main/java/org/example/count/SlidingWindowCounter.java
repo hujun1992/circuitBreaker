@@ -28,6 +28,9 @@ public class SlidingWindowCounter {
 
 
     }
+    public int getSize(){
+        return queue.size();
+    }
 
 
     public  int totalCount() {

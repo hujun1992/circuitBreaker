@@ -62,7 +62,7 @@ public class AppTest {
         CircuitBreaker circuitBreaker = new FailRateCircuitBreaker("10/20", 20, service);
 
         //启动100个线程，每个线程请求10次
-        for(int i =0; i< 100; i ++){
+        for(int i =0; i< 50; i ++){
             Thread thread = new Thread(new MytThread(circuitBreaker, service));
             thread.start();
         }
