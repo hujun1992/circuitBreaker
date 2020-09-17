@@ -76,11 +76,12 @@ public class AppTest {
 
         RemoteService service = new BillService();
         //定义熔断器
-        CircuitBreaker circuitBreaker = new FailRateCircuitBreaker("5/10", 20, service);
+        CircuitBreaker circuitBreaker = new FailRateCircuitBreaker("5/10", 3, service);
 
 
-            for (int i = 0; i < 20; i++) {
+            for (int i = 0; i < 1000; i++) {
                 try {
+                    Thread.sleep(1000);
                 String result = CircuitBreakerRunner.run(circuitBreaker, service);
                 }catch (Exception e){
                      e.printStackTrace();

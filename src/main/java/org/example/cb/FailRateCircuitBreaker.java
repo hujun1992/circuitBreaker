@@ -12,6 +12,28 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class FailRateCircuitBreaker extends AbstractCircuitBreaker {
     AtomicInteger num = new AtomicInteger();
     AtomicInteger failNum = new AtomicInteger();
+    /**
+     * 熔断器默认当前状态
+     */
+    public volatile String state = "close";
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        String currentState = getState();
+        if (currentState.getClass().getSimpleName().equals(state.getClass().getSimpleName())){
+            return;
+        }
+        synchronized (this){
+            // 二次判断
+            currentState = getState();
+            if (currentState.getClass().getSimpleName().equals(state.getClass().getSimpleName())){
+                return;
+            }
+            this.state = state;
+        }
+    }
 
     private SlidingWindowCounter slidingWindowCounter;
 
@@ -40,7 +62,7 @@ public class FailRateCircuitBreaker extends AbstractCircuitBreaker {
     protected void toOpenState(){
         state = "open";
         System.out.println(new Date(System.currentTimeMillis())+" >>>>>>> 熔断器已开启");
-        final Timer timer = new Timer();
+        Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -109,14 +131,15 @@ public class FailRateCircuitBreaker extends AbstractCircuitBreaker {
     @Override
     public synchronized void protectedCodeFail() {
 //        System.out.println("熔断器关闭状态->接口调用失败次数 " + failNum.incrementAndGet());
-        slidingWindowCounter.add(1);
-        String[] rate = getFailRateForClose().split("/");
-        int failNum = Integer.valueOf(rate[0]);
+        if("close".equals(state)) {
+            slidingWindowCounter.add(1);
+            String[] rate = getFailRateForClose().split("/");
+            int failNum = Integer.valueOf(rate[0]);
+            if (slidingWindowCounter.totalCount() == failNum) {
+                //熔断器开启
+                toOpenState();
 
-        if (slidingWindowCounter.totalCount() == failNum) {
-            //熔断器开启
-            toOpenState();
-
+            }
         }
 
 

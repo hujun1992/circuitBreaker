@@ -48,6 +48,11 @@ public class SlidingWindowCounter {
     }
 
     public static void main(String[] args) {
+        SlidingWindowCounter counter = new SlidingWindowCounter(50);
+        for(int i =0 ; i<100; i ++){
+            counter.add(1);
+            System.out.println(counter.toString());
+        }
 
 
     }
