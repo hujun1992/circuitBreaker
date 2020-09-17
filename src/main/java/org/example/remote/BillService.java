@@ -13,9 +13,10 @@ public class BillService implements RemoteService {
 
     @Override
     public String call() throws Exception {
-//        System.out.println("service接口调用次数  " + num.incrementAndGet());
         Random random = new Random();
-        //50%概率会超时
+        Thread.sleep(random.nextInt(2) * 1000);
+        throw new TimeoutException();
+        /*//50%概率会超时
         if (random.nextInt(2) == 1) {
             try {
                 Thread.sleep(2000);
@@ -26,14 +27,9 @@ public class BillService implements RemoteService {
         }
         else {
             throw new TimeoutException();
-//            return queryOrderSuccess();
-        }
+            return queryOrderSuccess();
+        }*/
 
-    }
-
-    @Override
-    public String fallback() {
-        return null;
     }
 
     private String queryOrderSuccess() {

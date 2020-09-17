@@ -1,12 +1,9 @@
 package org.example.proxy;
 
-import org.example.cb.AbstractCircuitBreaker;
 import org.example.cb.CircuitBreaker;
-import org.example.state.CloseState;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.util.concurrent.TimeoutException;
 
 public class ServiceProxy implements InvocationHandler {
     private CircuitBreaker circuitBreaker;

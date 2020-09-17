@@ -13,10 +13,4 @@ public interface RemoteService {
      */
     String call() throws TimeoutException, Exception;
 
-    /**
-     * 熔断开启后调用的本地方法
-     * @return
-     */
-    String fallback();
-
 }
