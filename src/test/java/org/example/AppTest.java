@@ -64,7 +64,7 @@ public class AppTest {
 
         RemoteService service = new BillService();
         //定义熔断器
-        CircuitBreaker circuitBreaker = new FailRateCircuitBreaker("5/50", 20, service);
+        CircuitBreaker circuitBreaker = new FailRateCircuitBreaker("5/50", 20);
         ServiceProxy serviceProxy = new ServiceProxy(circuitBreaker, service);
         for (int i = 0; i < 50; i++) {
             Thread thread = new Thread(new MytThread(serviceProxy, service));
@@ -83,7 +83,7 @@ public class AppTest {
 
         RemoteService service = new BillService();
         //定义熔断器
-        CircuitBreaker circuitBreaker = new FailRateCircuitBreaker("5/50", 4, service);
+        CircuitBreaker circuitBreaker = new FailRateCircuitBreaker("5/50", 4);
 
         ServiceProxy serviceProxy = new ServiceProxy(circuitBreaker, service);
 

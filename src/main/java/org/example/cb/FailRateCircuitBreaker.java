@@ -21,29 +21,12 @@ public class FailRateCircuitBreaker extends AbstractCircuitBreaker {
         return status;
     }
 
-    public void setStatus(String status) {
-        String currentStatus = getStatus();
-        if (currentStatus.equals(status)) {
-            return;
-        }
-        synchronized (this) {
-            // 二次判断
-            currentStatus = getStatus();
-            if (currentStatus.equals(status)) {
-                return;
-            }
-            this.status = status;
-        }
-    }
 
     private SlidingWindowCounter slidingWindowCounter;
 
-    Object target;
-
-    public FailRateCircuitBreaker(String failRateForClose, int timeForOpen, Object object) {
+    public FailRateCircuitBreaker(String failRateForClose, int timeForOpen) {
         this.failRateForClose = failRateForClose;
         this.timeForOpen = timeForOpen;
-        this.target = object;
         String[] rate = failRateForClose.split("/");
         int size = Integer.valueOf(rate[1]);
         slidingWindowCounter = new SlidingWindowCounter(size);

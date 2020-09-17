@@ -9,16 +9,13 @@ import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CloseState implements State {
-
     /**
-     * 进入当前状态的初始化时间
-     */
-    private long stateTime = System.currentTimeMillis();
-
-    /**
-     * 关闭状态，失败计数器，以及失败计数器初始化时间
+     * 失败次数
      */
     private AtomicInteger failNum = new AtomicInteger(0);
+    /**
+     * 总次数
+     */
     private AtomicInteger totalNum = new AtomicInteger(0);
 
     public String getStateName() {
